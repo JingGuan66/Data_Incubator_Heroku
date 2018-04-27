@@ -82,7 +82,7 @@
 var data{{v.id}} = [
 {% for statepop in v.indicator.first.state_pops%}["{{statepop.state.state_name}}",{{statepop.population}}],{% endfor %}
 ];
-$.getJSON('https://data-incubator-yangx.c9users.io/geo_api?geo_type=all_state',
+$.getJSON('/geo_api?geo_type=all_state',
 //$.getJSON('https://cdn.rawgit.com/highcharts/highcharts/057b672172ccc6c08fe7dbb27fc17ebca3f5b770/samples/data/germany.geo.json',
 function (geojson) {
     // Initiate the chart

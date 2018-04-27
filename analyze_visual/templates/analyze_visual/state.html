@@ -85,7 +85,7 @@
 var data{{v.id}} = [
 {% for countypop in v.indicator.first.county_pops|in_state:state%}["{{countypop.county.county_name}}",{{countypop.population}}],{% endfor %}
 ];
-$.getJSON('https://data-incubator-yangx.c9users.io/geo_api?geo_type=all_county&geo_state_id={{state.state_id}}',
+$.getJSON('/geo_api?geo_type=all_county&geo_state_id={{state.state_id}}',
 function (geojson) {
     // Initiate the chart
     Highcharts.mapChart('container{{v.id}}', {
