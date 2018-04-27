@@ -1,0 +1,239 @@
+{% extends "analyze_visual/base.html" %}
+
+  {% block header %}
+  <header id="header">
+    <div class="container">
+
+      <div id="logo" class="pull-left">
+        <h1><a href="#intro" class="scrollto">New England</a></h1>
+        <!-- Uncomment below if you prefer to use an image logo -->
+        <!-- <a href="#intro"><img src="img/logo.png" alt="" title=""></a> -->
+      </div>
+
+      <nav id="nav-menu-container">
+        <ul class="nav-menu">
+          <li class="menu-active"><a href="#intro">Home</a></li>
+          {% for v in visual %}<li><a href="#{{v.name}}">{{v.name}}</a></li>{% endfor %}
+          <li class="menu-has-children"><a href="">States</a>
+            <ul>
+              {% for state in states %}<li><a href="/state/{{state.state_short_name}}">{{state.state_name}}</a></li>{% endfor %}
+            </ul>
+          </li>
+        </ul>
+      </nav><!-- #nav-menu-container -->
+    </div>
+  </header><!-- #header -->
+  {% endblock %}
+
+
+
+{% block main %}
+    {% for v in visual %}
+    <section id="{{v.name}}">
+      <div class="container">
+
+        <div class="row">
+
+          <div class="col-lg-8 offset-lg-4">
+            <div class="section-header wow fadeIn" data-wow-duration="1s">
+              <h3 class="section-title">{{v.title}}</h3>
+              <span class="section-divider"></span>
+            </div>
+          </div>
+
+          <div class="col-lg-8 col-md-7 features-img">
+                {% if v.chart_type == 'PIE' %}<canvas id="container{{v.id}}"></canvas>{% else %}<div id="container{{v.id}}"></div>{% endif %}
+          </div>
+
+          <div class="col-lg-4 col-md-5 ">
+
+            <div class="row">
+              <div class="col-lg-12 col-md-12 box wow fadeInRight" data-wow-delay="0.3s">
+                <div class="icon"><i class="ion-ios-analytics-outline"></i></div>
+                <h4 class="title"><a href="">{{v.short_title}}</a></h4>
+                <p class="description">{{v.description}}</p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- #features -->
+    {% endfor %}
+
+{% endblock %}
+
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.highcharts.com/maps/highmaps.js"></script>
+<script src="https://code.highcharts.com/maps/modules/data.js"></script>
+<script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/maps/modules/offline-exporting.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0-rc.1/Chart.js"></script>
+<script>
+    
+// Prepare random data
+{% for v in visual %}
+{% if v.chart_type == "GEO" %}
+var data{{v.id}} = [
+{% for statepop in v.indicator.first.state_pops%}["{{statepop.state.state_name}}",{{statepop.population}}],{% endfor %}
+];
+$.getJSON('https://data-incubator-yangx.c9users.io/geo_api?geo_type=all_state',
+//$.getJSON('https://cdn.rawgit.com/highcharts/highcharts/057b672172ccc6c08fe7dbb27fc17ebca3f5b770/samples/data/germany.geo.json',
+function (geojson) {
+    // Initiate the chart
+    Highcharts.mapChart('container{{v.id}}', {
+        chart: {
+            map: geojson
+        },
+        title: {
+            text: '{{v.title}}'
+        },
+        mapNavigation: {
+            enabled: true,
+            buttonOptions: {
+                verticalAlign: 'bottom'
+            }
+        },
+        colorAxis: {
+            tickPixelInterval: 100
+        },
+        series: [{
+            data: data{{v.id}},
+            keys: ['name', 'value'],
+            joinBy: 'name',
+            name: 'Population',
+            states: {
+                hover: {
+                    color: '#a4edba'
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                format: '{point.properties.postal}'
+            }
+        }]
+    });
+});
+{% endif %}
+{% if v.chart_type == 'PIE' %}
+data{{v.id}} = [{% for i in v.indicator.all %}
+    {% for j in i.state_pops %}{% if forloop.first %}{{j.population}}{% else %} + {{j.population}}{% endif %} {% endfor %},
+    {% endfor %}]
+
+var ctx = document.getElementById("container{{v.id}}").getContext('2d');
+var myChart = new Chart(ctx, {
+  type: 'pie',
+  data: {
+    labels: [{% for i in v.indicator.all %}"{{i.indicator_name}}",{% endfor %}],
+    datasets: [{
+      backgroundColor: [
+        {% for i in v.indicator.all %}'#'+(Math.random()*0xFFFFFF<<0).toString(16),{% endfor %}
+      ],
+
+      data: data{{v.id}}
+    }]
+  },
+  options: {
+    responsive: true,
+    legend: {
+      position: 'bottom',
+    },
+    title: {
+      display: false,
+      text: '{{v.title}}'
+    },
+    animation: {
+      animateScale: true,
+      animateRotate: true
+    },
+    tooltips: {
+      callbacks: {
+        label: function(tooltipItem, data) {
+        	var dataset = data.datasets[tooltipItem.datasetIndex];
+          var total = dataset.data.reduce(function(previousValue, currentValue, currentIndex, array) {
+            return previousValue + currentValue;
+          });
+          var currentValue = dataset.data[tooltipItem.index];
+          var precentage = Math.floor(((currentValue/total) * 100)+0.5);         
+          return precentage + "%";
+        }
+      }
+    }
+  }
+});
+
+{% endif %}
+{% if v.chart_type == "BAR" %}
+var index{{v.id}} = {
+    {% for i in v.indicator.all %}
+    '{{i.indicator_name}}':{ {% for j in i.state_pops %}'{{j.state.state_name}}':{{j.population}},{% endfor %}},
+    {% endfor %}
+}
+
+s{{v.id}} = {}
+
+for (var key in index{{v.id}}) {
+  for (var ikey in index{{v.id}}[key]){
+      try{
+        s{{v.id}}[ikey].push(index{{v.id}}[key][ikey])
+      }
+      catch (error){
+          s{{v.id}}[ikey] = [index{{v.id}}[key][ikey]]
+      }
+  }
+}
+var series{{v.id}} = []
+for (var key in s{{v.id}}){
+    series{{v.id}}.push({"name": key, "data":s{{v.id}}[key]});
+}
+Highcharts.chart('container{{v.id}}', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: '{{v.title}}'
+    },
+    subtitle: {
+        text: 'Source: census.gov'
+    },
+    xAxis: {
+        categories: [
+            {% for i in v.indicator.all %}'{{i.indicator_name}}',{% endfor %}
+        ],
+        crosshair: true
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Population'
+        }
+    },
+    tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:1f} population</b></td></tr>',
+        footerFormat: '</table>',
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+    series: series{{v.id}}
+});
+//{{v.indicator.first.state_pops.first.state|safe}}
+
+{% endif %}
+{% endfor %}
+</script>
+
+
+{% endblock %}
