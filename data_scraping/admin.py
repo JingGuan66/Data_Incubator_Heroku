@@ -38,7 +38,13 @@ class CountyAdmin(admin.ModelAdmin):
     ordering = ['state']
     actions = [run_county_indicator]
 admin.site.register(County, CountyAdmin)
-admin.site.register(Indicator)
+
+class IndicatorAdmin(admin.ModelAdmin):
+    list_display = ['indicator_id', 'indicator_name']
+    ordering = ['-id']
+    list_editable = ['indicator_name']
+
+admin.site.register(Indicator, IndicatorAdmin)
 admin.site.register(Year)
 
 class StatePopAdmin(admin.ModelAdmin):

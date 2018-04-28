@@ -3,6 +3,7 @@ from data_scraping.models import State, County, StatePop, CountyPop, Indicator, 
 # Create your models here.
 
 CHART_TYPE = (
+    ('PNG','Picture'),
     ('BAR', 'Bar Chart'),
     ('GEO', 'Geo Chart'),
     ('LINE', 'Line Chart'),
@@ -14,8 +15,9 @@ class Visual(models.Model):
     title = models.CharField(max_length = 140, null=True, blank=True)
     short_title = models.CharField(max_length = 140, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+    image_url = models.CharField(max_length = 140, null=True, blank=True)
     chart_type = models.CharField(max_length=32, choices=CHART_TYPE, default='GEO')
-    indicator = models.ManyToManyField(Indicator)
+    indicator = models.ManyToManyField(Indicator, blank=True, null=True)
     order = models.IntegerField(default=0)
     
     def __str__(self):

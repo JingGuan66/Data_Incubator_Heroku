@@ -1,6 +1,39 @@
 {% extends "analyze_visual/base.html" %}
 {% load visual %}
 
+  {% block intro %}
+  <section id="intro">
+
+    <div class="intro-text">
+      <h2>Welcome to Avilon</h2>
+      <p>We are team of talanted designers making websites with Bootstrap</p>
+    </div>
+
+    <div class="product-screens">
+
+      <div class="product-screen-1 wow fadeInUp" data-wow-delay="0.4s" data-wow-duration="0.6s">
+        <img src="img/product-screen-1.png" alt="">
+      </div>
+
+      <div class="product-screen-2 wow fadeInUp" data-wow-delay="0.2s" data-wow-duration="0.6s">
+        <img src="img/product-screen-2.png" alt="">
+      </div>
+
+      <div class="product-screen-3 wow fadeInUp" data-wow-duration="0.6s">
+        <img src="img/product-screen-3.png" alt="">
+      </div>
+
+    </div>
+
+  </section><!-- #intro -->
+  {% endblock %}
+
+
+
+
+
+
+
   {% block header %}
   <header id="header">
     <div class="container">
@@ -31,7 +64,8 @@
 
 {% block main %}
     {% for v in visual %}
-    <section id="{{v.name}}">
+    {% if v.chart_type != "PNG" %}
+    <section id="{{v.name}}" style="padding: 60px 0 0 0;">
       <div class="container">
 
         <div class="row">
@@ -52,7 +86,7 @@
             <div class="row">
               <div class="col-lg-12 col-md-12 box wow fadeInRight" data-wow-delay="0.3s">
                 <div class="icon"><i class="ion-ios-analytics-outline"></i></div>
-                <h4 class="title"><a href="">{{ stateinfo|in_visual_title:v }}</a></h4>
+                <h4 class="title">{{ stateinfo|in_visual_title:v }}</h4>
                 <p class="description">{{ stateinfo|in_visual_description:v }}</p>
               </div>
             </div>
@@ -64,6 +98,7 @@
       </div>
 
     </section><!-- #features -->
+    {% endif %}
     {% endfor %}
 
 {% endblock %}
@@ -131,13 +166,13 @@ var index{{v.id}} = {
 
 s{{v.id}} = {}
 
-for (var key in index2) {
-  for (var ikey in index2[key]){
+for (var key in index{{v.id}}) {
+  for (var ikey in index{{v.id}}[key]){
       try{
-        s{{v.id}}[ikey].push(index2[key][ikey])
+        s{{v.id}}[ikey].push(index{{v.id}}[key][ikey])
       }
       catch (error){
-          s{{v.id}}[ikey] = [index2[key][ikey]]
+          s{{v.id}}[ikey] = [index{{v.id}}[key][ikey]]
       }
   }
 }

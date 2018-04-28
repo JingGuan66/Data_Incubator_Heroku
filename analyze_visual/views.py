@@ -20,7 +20,7 @@ def index(request):
 def state(request, state_short_name):
     template = loader.get_template('analyze_visual/state.html')
     context = {
-        'visual': Visual.objects.all().order_by('order'),
+        'visual': Visual.objects.all().exclude(chart_type="PNG").order_by('order'),
         'states':State.objects.all().order_by("state_name"),
         'state':State.objects.filter(state_short_name=state_short_name).first(),
         'stateinfo': StateInfo.objects.filter(state__state_short_name=state_short_name),

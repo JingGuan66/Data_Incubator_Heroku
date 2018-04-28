@@ -28,10 +28,53 @@
 
 
 {% block main %}
-    {% for v in visual %}
-    <section id="{{v.name}}">
-      <div class="container">
+<section id="about" class="section-bg">
+      <div class="container-fluid">
+        <div class="section-header">
+          <h3 class="section-title">About Me</h3>
+          <span class="section-divider"></span>
+          <p class="section-description">
+            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque<br>
+            sunt in culpa qui officia deserunt mollit anim id est laborum
+          </p>
+        </div>
 
+
+
+      </div>
+    </section>
+    {% for v in visual %}
+    {% if v.chart_type == "PNG" %}
+
+        
+<section id="{{v.name}}" style="padding: 60px 0 0 0;">
+
+        <div class="container">
+          <div class="row">
+            
+          <div class="col-lg-8 col-md-7 features-img">
+              <img class="advanced-feature-img-right wow fadeInRight img-fluid" src="{{v.image_url}}" alt="Responsive image" style="visibility: visible; animation-name: fadeInRight;">
+          </div>
+
+          <div class="col-lg-4 col-md-5 ">
+              <div class="wow fadeInLeft" style="visibility: visible; animation-name: fadeInLeft;">
+                <h2>{{v.title}}</h2>
+                <p>{{v.description}}</p>
+              </div>
+          </div>
+          </div>
+      </div>
+
+    </section>
+        
+        
+        
+        
+        
+        
+        {% else %}
+    <section id="{{v.name}}" style="padding: 60px 0 0 0;">
+      <div class="container">
         <div class="row">
 
           <div class="col-lg-8 offset-lg-4">
@@ -50,19 +93,19 @@
             <div class="row">
               <div class="col-lg-12 col-md-12 box wow fadeInRight" data-wow-delay="0.3s">
                 <div class="icon"><i class="ion-ios-analytics-outline"></i></div>
-                <h4 class="title"><a href="">{{v.short_title}}</a></h4>
+                <h4 class="title">{{v.short_title}}</h4>
                 <p class="description">{{v.description}}</p>
               </div>
             </div>
-
           </div>
-
         </div>
-
       </div>
-
     </section><!-- #features -->
+        {% endif %}
+
     {% endfor %}
+
+
 
 {% endblock %}
 

@@ -6,6 +6,8 @@ class StateInfoInline(admin.TabularInline):
     model = StateInfo
 
 class VisualAdmin(admin.ModelAdmin):
+    list_display = ['name', 'title', 'short_title', 'chart_type', 'image_url', 'order']
+    list_editable = ['title', 'short_title', 'chart_type', 'image_url', 'order']
     inlines = [
         StateInfoInline,
     ]
