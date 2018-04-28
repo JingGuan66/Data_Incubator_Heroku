@@ -12,7 +12,6 @@
 
       <nav id="nav-menu-container">
         <ul class="nav-menu">
-          <li class="menu-active"><a href="#intro">Home</a></li>
           {% for v in visual %}<li><a href="#{{v.name}}">{{v.name}}</a></li>{% endfor %}
           <li class="menu-has-children"><a href="">States</a>
             <ul>
